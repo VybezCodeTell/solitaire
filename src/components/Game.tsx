@@ -65,21 +65,6 @@ const Timer = styled.div`
   margin: 0.5rem 0;
 `;
 
-const Card = styled(motion.div)<{ faceUp: boolean }>`
-  width: 60px;
-  height: 90px;
-  background: ${props => props.faceUp ? 'white' : '#2a2a2a'};
-  border-radius: 4px;
-  margin: 0.25rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: ${props => props.faceUp ? 'black' : 'transparent'};
-  cursor: pointer;
-  user-select: none;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-`;
-
 const Game: React.FC = () => {
   const [gameState, setGameState] = useState<GameState>(() => {
     const config: GameConfig = {

@@ -1,7 +1,29 @@
-import type { Card, GameState, Move, PlayerState, Rank, Suit, GameConfig } from '../types/game';
+import type {
+  Card,
+  GameState,
+  Move,
+  PlayerState,
+  Rank,
+  Suit,
+  GameConfig,
+} from "../types/game";
 
-const SUITS: Suit[] = ['hearts', 'diamonds', 'clubs', 'spades'];
-const RANKS: Rank[] = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+const SUITS: Suit[] = ["hearts", "diamonds", "clubs", "spades"];
+const RANKS: Rank[] = [
+  "A",
+  "2",
+  "3",
+  "4",
+  "5",
+  "6",
+  "7",
+  "8",
+  "9",
+  "10",
+  "J",
+  "Q",
+  "K",
+];
 
 // Deterministic shuffle using Fisher-Yates algorithm with seed
 const seededShuffle = (array: Card[], seed: number): Card[] => {
@@ -40,11 +62,13 @@ export const initializeGame = (config: GameConfig): GameState => {
     const stock = deck.slice(0, 24);
     const waste: Card[] = [];
     const foundations: Card[][] = [[], [], [], []];
-    const tableau: Card[][] = Array(7).fill(null).map((_, i) => {
-      const cards = deck.slice(24 + i * 4, 24 + (i + 1) * 4);
-      cards[cards.length - 1].faceUp = true;
-      return cards;
-    });
+    const tableau: Card[][] = Array(7)
+      .fill(null)
+      .map((_, i) => {
+        const cards = deck.slice(24 + i * 4, 24 + (i + 1) * 4);
+        cards[cards.length - 1].faceUp = true;
+        return cards;
+      });
 
     return {
       tableau,
@@ -71,47 +95,52 @@ export const initializeGame = (config: GameConfig): GameState => {
 };
 
 export const isValidMove = (move: Move, gameState: GameState): boolean => {
-  const player = gameState.currentPlayer === 1 ? gameState.player1 : gameState.player2;
+  const player =
+    gameState.currentPlayer === 1 ? gameState.player1 : gameState.player2;
   const { from, to, cards } = move;
 
   // Check stock passes limit
-  if (from.type === 'stock' && player.stockPasses >= gameState.maxStockPasses) {
+  if (from.type === "stock" && player.stockPasses >= gameState.maxStockPasses) {
     return false;
   }
 
   // Get source cards
   let sourceCards: Card[] = [];
   switch (from.type) {
-    case 'stock':
+    case "stock":
       if (player.stock.length === 0) return false;
       sourceCards = [player.stock[player.stock.length - 1]];
       break;
-    case 'waste':
+    case "waste":
       if (player.waste.length === 0) return false;
       sourceCards = [player.waste[player.waste.length - 1]];
       break;
-    case 'foundation':
+    case "foundation":
       if (player.foundations[from.index].length === 0) return false;
-      sourceCards = [player.foundations[from.index][player.foundations[from.index].length - 1]];
+      sourceCards = [
+        player.foundations[from.index][
+          player.foundations[from.index].length - 1
+        ],
+      ];
       break;
-    case 'tableau':
+    case "tableau":
       if (player.tableau[from.index].length === 0) return false;
       const tableauCards = player.tableau[from.index].slice(-cards.length);
-      if (tableauCards.some(card => !card.faceUp)) return false;
+      if (tableauCards.some((card) => !card.faceUp)) return false;
       sourceCards = tableauCards;
       break;
   }
 
   // Validate move to foundation
-  if (to.type === 'foundation') {
+  if (to.type === "foundation") {
     if (sourceCards.length !== 1) return false;
     const card = sourceCards[0];
     const foundation = player.foundations[to.index];
-    
+
     if (foundation.length === 0) {
-      return card.rank === 'A';
+      return card.rank === "A";
     }
-    
+
     const topCard = foundation[foundation.length - 1];
     return (
       card.suit === topCard.suit &&
@@ -120,17 +149,16 @@ export const isValidMove = (move: Move, gameState: GameState): boolean => {
   }
 
   // Validate move to tableau
-  if (to.type === 'tableau') {
+  if (to.type === "tableau") {
     const tableau = player.tableau[to.index];
     const card = sourceCards[0];
 
     if (tableau.length === 0) {
-      return card.rank === 'K';
+      return card.rank === "K";
     }
 
     const topCard = tableau[tableau.length - 1];
-    const isRed = (suit: Suit) => suit === 'hearts' || suit === 'diamonds';
-    const isBlack = (suit: Suit) => suit === 'clubs' || suit === 'spades';
+    const isRed = (suit: Suit) => suit === "hearts" || suit === "diamonds";
 
     return (
       isRed(card.suit) !== isRed(topCard.suit) &&
@@ -145,7 +173,8 @@ export const makeMove = (move: Move, gameState: GameState): GameState => {
   if (!isValidMove(move, gameState)) return gameState;
 
   const newState = JSON.parse(JSON.stringify(gameState)) as GameState;
-  const player = newState.currentPlayer === 1 ? newState.player1 : newState.player2;
+  const player =
+    newState.currentPlayer === 1 ? newState.player1 : newState.player2;
 
   // Add move to log
   const moveWithTimestamp = {
@@ -156,35 +185,40 @@ export const makeMove = (move: Move, gameState: GameState): GameState => {
 
   // Remove cards from source
   switch (move.from.type) {
-    case 'stock':
+    case "stock":
       player.stock.pop();
       if (player.stock.length === 0) {
         player.stockPasses++;
       }
       break;
-    case 'waste':
+    case "waste":
       player.waste.pop();
       break;
-    case 'foundation':
+    case "foundation":
       player.foundations[move.from.index].pop();
       break;
-    case 'tableau':
-      player.tableau[move.from.index] = player.tableau[move.from.index].slice(0, -move.cards.length);
+    case "tableau":
+      player.tableau[move.from.index] = player.tableau[move.from.index].slice(
+        0,
+        -move.cards.length
+      );
       if (player.tableau[move.from.index].length > 0) {
-        player.tableau[move.from.index][player.tableau[move.from.index].length - 1].faceUp = true;
+        player.tableau[move.from.index][
+          player.tableau[move.from.index].length - 1
+        ].faceUp = true;
       }
       break;
   }
 
   // Add cards to destination
   switch (move.to.type) {
-    case 'foundation':
+    case "foundation":
       player.foundations[move.to.index].push(move.cards[0]);
       break;
-    case 'tableau':
+    case "tableau":
       player.tableau[move.to.index].push(...move.cards);
       break;
-    case 'waste':
+    case "waste":
       player.waste.push(move.cards[0]);
       break;
   }
@@ -193,8 +227,9 @@ export const makeMove = (move: Move, gameState: GameState): GameState => {
 };
 
 export const checkWinCondition = (gameState: GameState): boolean => {
-  const player = gameState.currentPlayer === 1 ? gameState.player1 : gameState.player2;
-  return player.foundations.every(foundation => foundation.length === 13);
+  const player =
+    gameState.currentPlayer === 1 ? gameState.player1 : gameState.player2;
+  return player.foundations.every((foundation) => foundation.length === 13);
 };
 
 export const isGameOver = (gameState: GameState): boolean => {
@@ -202,10 +237,15 @@ export const isGameOver = (gameState: GameState): boolean => {
 };
 
 export const getPlayerScore = (player: PlayerState): number => {
-  return player.foundations.reduce((score, foundation) => score + foundation.length, 0);
+  return player.foundations.reduce(
+    (score, foundation) => score + foundation.length,
+    0
+  );
 };
 
-export const getGameProgress = (gameState: GameState): { player1: number; player2: number } => {
+export const getGameProgress = (
+  gameState: GameState
+): { player1: number; player2: number } => {
   return {
     player1: getPlayerScore(gameState.player1),
     player2: getPlayerScore(gameState.player2),
@@ -219,7 +259,7 @@ export const getPlayerTime = (player: PlayerState): number => {
 export const updatePlayerTimer = (gameState: GameState): GameState => {
   const newState = { ...gameState };
   const currentTime = Date.now();
-  
+
   if (newState.startTime && !newState.endTime) {
     const elapsedTime = (currentTime - newState.startTime) / 1000;
     if (newState.currentPlayer === 1) {
@@ -228,6 +268,6 @@ export const updatePlayerTimer = (gameState: GameState): GameState => {
       newState.player2.timer = elapsedTime;
     }
   }
-  
+
   return newState;
-}; 
+};
