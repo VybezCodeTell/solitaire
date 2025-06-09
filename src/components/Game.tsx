@@ -18,12 +18,24 @@ const GameContainer = styled.div`
   min-height: 100vh;
   background: #1a1a1a;
   color: white;
+  box-sizing: border-box;
+
+  @media (max-width: 600px) {
+    padding: 0.5rem;
+  }
 `;
 
 const GameBoard = styled.div`
   display: flex;
   gap: 2rem;
   margin-top: 2rem;
+
+  @media (max-width: 900px) {
+    flex-direction: column;
+    gap: 1rem;
+    width: 100%;
+    align-items: center;
+  }
 `;
 
 const PlayerBoardWrapper = styled.div<{ isActive: boolean }>`
@@ -32,6 +44,14 @@ const PlayerBoardWrapper = styled.div<{ isActive: boolean }>`
   background: ${props => props.isActive ? '#2a2a2a' : '#1a1a1a'};
   border: 2px solid ${props => props.isActive ? '#4a4a4a' : 'transparent'};
   transition: all 0.3s ease;
+  width: 400px;
+  max-width: 95vw;
+  box-sizing: border-box;
+
+  @media (max-width: 600px) {
+    width: 100%;
+    padding: 0.5rem;
+  }
 `;
 
 const GameStatus = styled.div`
@@ -40,6 +60,12 @@ const GameStatus = styled.div`
   align-items: center;
   gap: 1rem;
   margin-bottom: 2rem;
+  width: 100%;
+
+  @media (max-width: 600px) {
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
 `;
 
 const ProgressBar = styled.div`
@@ -49,6 +75,12 @@ const ProgressBar = styled.div`
   border-radius: 10px;
   overflow: hidden;
   margin: 0.5rem 0;
+
+  @media (max-width: 600px) {
+    width: 100%;
+    min-width: 120px;
+    height: 16px;
+  }
 `;
 
 const Progress = styled.div<{ width: number }>`
@@ -62,6 +94,10 @@ const Timer = styled.div`
   font-size: 1.2rem;
   font-weight: bold;
   margin: 0.5rem 0;
+
+  @media (max-width: 600px) {
+    font-size: 1rem;
+  }
 `;
 
 const Game: React.FC = () => {

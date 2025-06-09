@@ -7,17 +7,34 @@ const BoardContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  width: 100%;
+
+  @media (max-width: 600px) {
+    gap: 0.5rem;
+  }
 `;
 
 const Row = styled.div`
   display: flex;
   gap: 0.5rem;
+  flex-wrap: wrap;
+  width: 100%;
+  box-sizing: border-box;
+
+  @media (max-width: 600px) {
+    gap: 0.25rem;
+  }
 `;
 
 const CardStack = styled.div`
   position: relative;
   min-width: 60px;
   min-height: 90px;
+
+  @media (max-width: 600px) {
+    min-width: 36px;
+    min-height: 54px;
+  }
 `;
 
 const Card = styled(motion.div)<{ faceUp: boolean; suit: string; isSelected?: boolean }>`
@@ -42,6 +59,13 @@ const Card = styled(motion.div)<{ faceUp: boolean; suit: string; isSelected?: bo
   &:hover {
     transform: translateY(-5px);
   }
+
+  @media (max-width: 600px) {
+    width: 36px;
+    height: 54px;
+    font-size: 0.8rem;
+    border-radius: 3px;
+  }
 `;
 
 const CardPreview = styled(motion.div)<{ faceUp: boolean; suit: string }>`
@@ -59,6 +83,13 @@ const CardPreview = styled(motion.div)<{ faceUp: boolean; suit: string }>`
   font-weight: bold;
   opacity: 0.5;
   z-index: 0;
+
+  @media (max-width: 600px) {
+    width: 36px;
+    height: 54px;
+    font-size: 0.8rem;
+    border-radius: 3px;
+  }
 `;
 
 interface PlayerBoardProps {
