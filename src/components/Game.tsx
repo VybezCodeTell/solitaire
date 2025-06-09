@@ -1,6 +1,5 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from '@emotion/styled';
-import { motion } from 'framer-motion';
 import type { GameState, Move, GameConfig } from '../types/game';
 import {
   initializeGame,
