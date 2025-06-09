@@ -19,86 +19,88 @@ const GameContainer = styled.div`
   background: #1a1a1a;
   color: white;
   box-sizing: border-box;
+  width: 100vw;
+  max-width: 100vw;
+  overflow-x: hidden;
 
   @media (max-width: 600px) {
     padding: 0.5rem;
   }
 `;
 
-const GameBoard = styled.div`
-  display: flex;
-  gap: 2rem;
-  margin-top: 2rem;
-
-  @media (max-width: 900px) {
-    flex-direction: column;
-    gap: 1rem;
-    width: 100%;
-    align-items: center;
-  }
-`;
-
-const PlayerBoardWrapper = styled.div<{ isActive: boolean }>`
-  padding: 1rem;
-  border-radius: 8px;
-  background: ${props => props.isActive ? '#2a2a2a' : '#1a1a1a'};
-  border: 2px solid ${props => props.isActive ? '#4a4a4a' : 'transparent'};
-  transition: all 0.3s ease;
-  width: 400px;
-  max-width: 95vw;
-  box-sizing: border-box;
-
-  @media (max-width: 600px) {
-    width: 100%;
-    padding: 0.5rem;
-  }
-`;
-
-const GameStatus = styled.div`
+const SplitBoard = styled.div`
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 2rem;
-  width: 100%;
-
-  @media (max-width: 600px) {
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-  }
-`;
-
-const ProgressBar = styled.div`
-  width: 200px;
-  height: 20px;
-  background: #333;
-  border-radius: 10px;
+  width: 900px;
+  max-width: 98vw;
+  background: #e0e0e0;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
   overflow: hidden;
-  margin: 0.5rem 0;
+
+  @media (max-width: 900px) {
+    width: 100vw;
+    border-radius: 0;
+  }
 
   @media (max-width: 600px) {
-    width: 100%;
-    min-width: 120px;
-    height: 16px;
+    flex-direction: column;
+    width: 100vw;
+    background: #e0e0e0;
   }
 `;
 
-const Progress = styled.div<{ width: number }>`
-  width: ${props => props.width}%;
-  height: 100%;
-  background: #4CAF50;
-  transition: width 0.3s ease;
+const PlayerSection = styled.section<{ borderBottom?: boolean }>`
+  flex: 1;
+  padding: 2rem 1.5rem 1.5rem 1.5rem;
+  border-bottom: ${props => props.borderBottom ? '2px solid #bbb' : 'none'};
+  background: #e0e0e0;
+  position: relative;
+
+  @media (max-width: 600px) {
+    padding: 1rem 0.5rem;
+    border-bottom: none;
+    border-top: ${props => props.borderBottom ? '2px solid #bbb' : 'none'};
+  }
 `;
 
-const Timer = styled.div`
-  font-size: 1.2rem;
+const SectionLabel = styled.h2`
+  font-size: 1.3rem;
   font-weight: bold;
-  margin: 0.5rem 0;
+  margin: 0 0 0.5rem 0;
+  color: #222;
+  letter-spacing: 1px;
 
   @media (max-width: 600px) {
-    font-size: 1rem;
+    font-size: 1.1rem;
+    margin-bottom: 0.25rem;
   }
 `;
+
+const GameTitle = styled.h1`
+  font-size: 2.2rem;
+  font-weight: bold;
+  margin-bottom: 1.5rem;
+  color: #222;
+  letter-spacing: 2px;
+  text-align: center;
+
+  @media (max-width: 600px) {
+    font-size: 1.4rem;
+    margin-bottom: 0.5rem;
+  }
+`;
+
+const useIsMobile = () => {
+  const [isMobile, setIsMobile] = React.useState(false);
+  React.useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth <= 600);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
+  return isMobile;
+};
 
 const Game: React.FC = () => {
   const [gameState, setGameState] = useState<GameState>(() => {
@@ -109,6 +111,7 @@ const Game: React.FC = () => {
     const state = initializeGame(config);
     return { ...state, startTime: Date.now() };
   });
+  const isMobile = useIsMobile();
 
   // Update timers
   useEffect(() => {
@@ -152,35 +155,10 @@ const Game: React.FC = () => {
 
   return (
     <GameContainer>
-      <h1>Competitive Solitaire</h1>
-      <GameStatus>
-        {gameState.winner ? (
-          <h2>Player {gameState.winner} wins!</h2>
-        ) : (
-          <h2>Current Player: {gameState.currentPlayer}</h2>
-        )}
-        <div>
-          <h3>Player 1</h3>
-          <Timer>Time: {formatTime(gameState.player1.timer)}</Timer>
-          <ProgressBar>
-            <Progress width={player1Progress} />
-          </ProgressBar>
-          <p>{progress.player1} / {maxScore} cards</p>
-          <p>Stock Passes: {gameState.player1.stockPasses} / {gameState.maxStockPasses}</p>
-        </div>
-        <div>
-          <h3>Player 2</h3>
-          <Timer>Time: {formatTime(gameState.player2.timer)}</Timer>
-          <ProgressBar>
-            <Progress width={player2Progress} />
-          </ProgressBar>
-          <p>{progress.player2} / {maxScore} cards</p>
-          <p>Stock Passes: {gameState.player2.stockPasses} / {gameState.maxStockPasses}</p>
-        </div>
-      </GameStatus>
-      <GameBoard>
-        <PlayerBoardWrapper isActive={gameState.currentPlayer === 1}>
-          <h3>Player 1</h3>
+      <GameTitle>TWO-PLAYER SOLITAIRE</GameTitle>
+      <SplitBoard>
+        <PlayerSection borderBottom={!isMobile}>
+          <SectionLabel>Player 1</SectionLabel>
           <PlayerBoard
             stock={gameState.player1.stock}
             waste={gameState.player1.waste}
@@ -188,10 +166,12 @@ const Game: React.FC = () => {
             tableau={gameState.player1.tableau}
             onCardClick={handleCardClick}
             isActive={gameState.currentPlayer === 1}
+            layout={isMobile ? 'mobile' : 'desktop'}
+            playerLabel="Player 1"
           />
-        </PlayerBoardWrapper>
-        <PlayerBoardWrapper isActive={gameState.currentPlayer === 2}>
-          <h3>Player 2</h3>
+        </PlayerSection>
+        <PlayerSection>
+          <SectionLabel>Player 2</SectionLabel>
           <PlayerBoard
             stock={gameState.player2.stock}
             waste={gameState.player2.waste}
@@ -199,9 +179,11 @@ const Game: React.FC = () => {
             tableau={gameState.player2.tableau}
             onCardClick={handleCardClick}
             isActive={gameState.currentPlayer === 2}
+            layout={isMobile ? 'mobile' : 'desktop'}
+            playerLabel="Player 2"
           />
-        </PlayerBoardWrapper>
-      </GameBoard>
+        </PlayerSection>
+      </SplitBoard>
     </GameContainer>
   );
 };

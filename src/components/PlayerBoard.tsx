@@ -92,6 +92,34 @@ const CardPreview = styled(motion.div)<{ faceUp: boolean; suit: string }>`
   }
 `;
 
+const SectionLabel = styled.div`
+  font-size: 1.1rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  color: #222;
+  letter-spacing: 1px;
+
+  @media (max-width: 600px) {
+    font-size: 1rem;
+    margin-bottom: 0.25rem;
+  }
+`;
+
+const Area = styled.div<{ direction?: string }>`
+  display: flex;
+  flex-direction: ${props => props.direction || 'row'};
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  width: 100%;
+
+  @media (max-width: 600px) {
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+`;
+
 interface PlayerBoardProps {
   stock: Card[];
   waste: Card[];
@@ -99,6 +127,8 @@ interface PlayerBoardProps {
   tableau: Card[][];
   onCardClick: (move: Move) => void;
   isActive: boolean;
+  layout: 'desktop' | 'mobile';
+  playerLabel: string;
 }
 
 const PlayerBoard: React.FC<PlayerBoardProps> = ({
@@ -108,6 +138,8 @@ const PlayerBoard: React.FC<PlayerBoardProps> = ({
   tableau,
   onCardClick,
   isActive,
+  layout,
+  playerLabel,
 }) => {
   const [selectedCard, setSelectedCard] = useState<{
     type: 'waste' | 'foundation' | 'tableau';
@@ -229,98 +261,222 @@ const PlayerBoard: React.FC<PlayerBoardProps> = ({
 
   return (
     <BoardContainer>
-      <Row>
-        <CardStack>
-          <Card
-            faceUp={false}
-            suit=""
-            onClick={handleStockClick}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            {stock.length}
-          </Card>
-        </CardStack>
-        <CardStack>
-          {waste.length > 0 && (
-            <Card
-              faceUp={true}
-              suit={waste[waste.length - 1].suit}
-              onClick={() => handleCardClick('waste', 0)}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              isSelected={isCardSelected('waste', 0)}
-              drag
-              dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
-              onDragStart={() => setDraggedCard({ type: 'waste', index: 0 })}
-              onDragEnd={() => setDraggedCard(null)}
-            >
-              {waste[waste.length - 1].rank}
-            </Card>
-          )}
-        </CardStack>
-        {foundations.map((foundation, i) => (
-          <CardStack key={i}>
-            {foundation.length > 0 && (
-              <Card
-                faceUp={true}
-                suit={foundation[foundation.length - 1].suit}
-                onClick={() => handleCardClick('foundation', i)}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                isSelected={isCardSelected('foundation', i)}
-                drag
-                dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
-                onDragStart={() => setDraggedCard({ type: 'foundation', index: i })}
-                onDragEnd={() => setDraggedCard(null)}
-              >
-                {foundation[foundation.length - 1].rank}
-              </Card>
-            )}
-          </CardStack>
-        ))}
-      </Row>
-      <Row>
-        {tableau.map((pile, i) => (
-          <CardStack key={i}>
-            {pile.map((card, j) => (
-              <div key={j}>
-                <AnimatePresence>
-                  {draggedCard?.type === 'tableau' && 
-                   draggedCard.index === i && 
-                   draggedCard.cardIndex === j && 
-                   getCardBelow('tableau', i, j) && (
-                    <CardPreview
-                      faceUp={getCardBelow('tableau', i, j)!.faceUp}
-                      suit={getCardBelow('tableau', i, j)!.suit}
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 0.5 }}
-                      exit={{ opacity: 0 }}
+      {layout === 'desktop' ? (
+        <>
+          <SectionLabel>{playerLabel}</SectionLabel>
+          <Area direction="row">
+            <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '1rem' }}>
+              <div>
+                <SectionLabel>Foundation</SectionLabel>
+                <Row>
+                  {foundations.map((stack, i) => (
+                    <CardStack key={i}>
+                      {stack.map((card, j) => (
+                        <Card
+                          faceUp={true}
+                          suit={card.suit}
+                          onClick={() => handleCardClick('foundation', i)}
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          isSelected={isCardSelected('foundation', i)}
+                          drag
+                          dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
+                          onDragStart={() => setDraggedCard({ type: 'foundation', index: i })}
+                          onDragEnd={() => setDraggedCard(null)}
+                        >
+                          {card.rank}
+                        </Card>
+                      ))}
+                    </CardStack>
+                  ))}
+                </Row>
+              </div>
+              <div>
+                <Row>
+                  <CardStack>
+                    <Card
+                      faceUp={false}
+                      suit=""
+                      onClick={handleStockClick}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
                     >
-                      {getCardBelow('tableau', i, j)!.rank}
-                    </CardPreview>
-                  )}
-                </AnimatePresence>
+                      {stock.length}
+                    </Card>
+                  </CardStack>
+                  <CardStack>
+                    {waste.length > 0 && (
+                      <Card
+                        faceUp={true}
+                        suit={waste[waste.length - 1].suit}
+                        onClick={() => handleCardClick('waste', 0)}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        isSelected={isCardSelected('waste', 0)}
+                        drag
+                        dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
+                        onDragStart={() => setDraggedCard({ type: 'waste', index: 0 })}
+                        onDragEnd={() => setDraggedCard(null)}
+                      >
+                        {waste[waste.length - 1].rank}
+                      </Card>
+                    )}
+                  </CardStack>
+                </Row>
+                <div style={{ fontSize: '0.9rem', color: '#444', marginTop: '0.2rem' }}>Waste</div>
+              </div>
+            </div>
+          </Area>
+          <SectionLabel>Tableau</SectionLabel>
+          <Row>
+            {tableau.map((stack, i) => (
+              <CardStack key={i}>
+                {stack.map((card, j) => (
+                  <div key={j}>
+                    <AnimatePresence>
+                      {draggedCard?.type === 'tableau' && 
+                       draggedCard.index === i && 
+                       draggedCard.cardIndex === j && 
+                       getCardBelow('tableau', i, j) && (
+                        <CardPreview
+                          faceUp={getCardBelow('tableau', i, j)!.faceUp}
+                          suit={getCardBelow('tableau', i, j)!.suit}
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 0.5 }}
+                          exit={{ opacity: 0 }}
+                        >
+                          {getCardBelow('tableau', i, j)!.rank}
+                        </CardPreview>
+                      )}
+                    </AnimatePresence>
+                    <Card
+                      faceUp={card.faceUp}
+                      suit={card.suit}
+                      style={{ top: j * 20 }}
+                      onClick={() => handleCardClick('tableau', i, j)}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      isSelected={isCardSelected('tableau', i, j)}
+                      drag
+                      dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
+                      onDragStart={() => setDraggedCard({ type: 'tableau', index: i, cardIndex: j })}
+                      onDragEnd={() => setDraggedCard(null)}
+                    >
+                      {card.rank}
+                    </Card>
+                  </div>
+                ))}
+              </CardStack>
+            ))}
+          </Row>
+        </>
+      ) : (
+        <>
+          <SectionLabel>{playerLabel}</SectionLabel>
+          <SectionLabel>Tableau</SectionLabel>
+          <Row>
+            {tableau.map((stack, i) => (
+              <CardStack key={i}>
+                {stack.map((card, j) => (
+                  <div key={j}>
+                    <AnimatePresence>
+                      {draggedCard?.type === 'tableau' && 
+                       draggedCard.index === i && 
+                       draggedCard.cardIndex === j && 
+                       getCardBelow('tableau', i, j) && (
+                        <CardPreview
+                          faceUp={getCardBelow('tableau', i, j)!.faceUp}
+                          suit={getCardBelow('tableau', i, j)!.suit}
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 0.5 }}
+                          exit={{ opacity: 0 }}
+                        >
+                          {getCardBelow('tableau', i, j)!.rank}
+                        </CardPreview>
+                      )}
+                    </AnimatePresence>
+                    <Card
+                      faceUp={card.faceUp}
+                      suit={card.suit}
+                      style={{ top: j * 20 }}
+                      onClick={() => handleCardClick('tableau', i, j)}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      isSelected={isCardSelected('tableau', i, j)}
+                      drag
+                      dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
+                      onDragStart={() => setDraggedCard({ type: 'tableau', index: i, cardIndex: j })}
+                      onDragEnd={() => setDraggedCard(null)}
+                    >
+                      {card.rank}
+                    </Card>
+                  </div>
+                ))}
+              </CardStack>
+            ))}
+          </Row>
+          <Area direction="column">
+            <div>
+              <div style={{ marginBottom: '0.2rem' }}>Stock</div>
+              <CardStack>
                 <Card
-                  faceUp={card.faceUp}
-                  suit={card.suit}
-                  style={{ top: j * 20 }}
-                  onClick={() => handleCardClick('tableau', i, j)}
+                  faceUp={false}
+                  suit=""
+                  onClick={handleStockClick}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  isSelected={isCardSelected('tableau', i, j)}
-                  drag
-                  dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
-                  onDragStart={() => setDraggedCard({ type: 'tableau', index: i, cardIndex: j })}
-                  onDragEnd={() => setDraggedCard(null)}
                 >
-                  {card.rank}
+                  {stock.length}
                 </Card>
-              </div>
+              </CardStack>
+            </div>
+            <div>
+              <div style={{ marginBottom: '0.2rem' }}>Waste</div>
+              <CardStack>
+                {waste.length > 0 && (
+                  <Card
+                    faceUp={true}
+                    suit={waste[waste.length - 1].suit}
+                    onClick={() => handleCardClick('waste', 0)}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    isSelected={isCardSelected('waste', 0)}
+                    drag
+                    dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
+                    onDragStart={() => setDraggedCard({ type: 'waste', index: 0 })}
+                    onDragEnd={() => setDraggedCard(null)}
+                  >
+                    {waste[waste.length - 1].rank}
+                  </Card>
+                )}
+              </CardStack>
+            </div>
+          </Area>
+          <SectionLabel>Foundation</SectionLabel>
+          <Row>
+            {foundations.map((stack, i) => (
+              <CardStack key={i}>
+                {stack.map((card, j) => (
+                  <Card
+                    faceUp={true}
+                    suit={card.suit}
+                    onClick={() => handleCardClick('foundation', i)}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    isSelected={isCardSelected('foundation', i)}
+                    drag
+                    dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
+                    onDragStart={() => setDraggedCard({ type: 'foundation', index: i })}
+                    onDragEnd={() => setDraggedCard(null)}
+                  >
+                    {card.rank}
+                  </Card>
+                ))}
+              </CardStack>
             ))}
-          </CardStack>
-        ))}
-      </Row>
+          </Row>
+        </>
+      )}
     </BoardContainer>
   );
 };
