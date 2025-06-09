@@ -5,7 +5,6 @@ import {
   initializeGame,
   makeMove,
   checkWinCondition,
-  getGameProgress,
   updatePlayerTimer,
 } from '../utils/gameLogic';
 import PlayerBoard from './PlayerBoard';
@@ -141,17 +140,6 @@ const Game: React.FC = () => {
       }
     }
   };
-
-  const formatTime = (seconds: number) => {
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = Math.floor(seconds % 60);
-    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
-  };
-
-  const progress = getGameProgress(gameState);
-  const maxScore = 52; // 13 cards * 4 suits
-  const player1Progress = (progress.player1 / maxScore) * 100;
-  const player2Progress = (progress.player2 / maxScore) * 100;
 
   return (
     <GameContainer>

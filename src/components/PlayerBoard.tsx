@@ -271,7 +271,7 @@ const PlayerBoard: React.FC<PlayerBoardProps> = ({
                 <Row>
                   {foundations.map((stack, i) => (
                     <CardStack key={i}>
-                      {stack.map((card, j) => (
+                      {stack.map((card) => (
                         <Card
                           faceUp={true}
                           suit={card.suit}
@@ -331,35 +331,35 @@ const PlayerBoard: React.FC<PlayerBoardProps> = ({
           <Row>
             {tableau.map((stack, i) => (
               <CardStack key={i}>
-                {stack.map((card, j) => (
-                  <div key={j}>
+                {stack.map((card, cardIndex) => (
+                  <div>
                     <AnimatePresence>
                       {draggedCard?.type === 'tableau' && 
                        draggedCard.index === i && 
-                       draggedCard.cardIndex === j && 
-                       getCardBelow('tableau', i, j) && (
+                       draggedCard.cardIndex === cardIndex && 
+                       getCardBelow('tableau', i, cardIndex) && (
                         <CardPreview
-                          faceUp={getCardBelow('tableau', i, j)!.faceUp}
-                          suit={getCardBelow('tableau', i, j)!.suit}
+                          faceUp={getCardBelow('tableau', i, cardIndex)!.faceUp}
+                          suit={getCardBelow('tableau', i, cardIndex)!.suit}
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 0.5 }}
                           exit={{ opacity: 0 }}
                         >
-                          {getCardBelow('tableau', i, j)!.rank}
+                          {getCardBelow('tableau', i, cardIndex)!.rank}
                         </CardPreview>
                       )}
                     </AnimatePresence>
                     <Card
                       faceUp={card.faceUp}
                       suit={card.suit}
-                      style={{ top: j * 20 }}
-                      onClick={() => handleCardClick('tableau', i, j)}
+                      style={{ top: cardIndex * 20 }}
+                      onClick={() => handleCardClick('tableau', i, cardIndex)}
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
-                      isSelected={isCardSelected('tableau', i, j)}
+                      isSelected={isCardSelected('tableau', i, cardIndex)}
                       drag
                       dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
-                      onDragStart={() => setDraggedCard({ type: 'tableau', index: i, cardIndex: j })}
+                      onDragStart={() => setDraggedCard({ type: 'tableau', index: i, cardIndex })}
                       onDragEnd={() => setDraggedCard(null)}
                     >
                       {card.rank}
@@ -377,35 +377,35 @@ const PlayerBoard: React.FC<PlayerBoardProps> = ({
           <Row>
             {tableau.map((stack, i) => (
               <CardStack key={i}>
-                {stack.map((card, j) => (
-                  <div key={j}>
+                {stack.map((card, cardIndex) => (
+                  <div>
                     <AnimatePresence>
                       {draggedCard?.type === 'tableau' && 
                        draggedCard.index === i && 
-                       draggedCard.cardIndex === j && 
-                       getCardBelow('tableau', i, j) && (
+                       draggedCard.cardIndex === cardIndex && 
+                       getCardBelow('tableau', i, cardIndex) && (
                         <CardPreview
-                          faceUp={getCardBelow('tableau', i, j)!.faceUp}
-                          suit={getCardBelow('tableau', i, j)!.suit}
+                          faceUp={getCardBelow('tableau', i, cardIndex)!.faceUp}
+                          suit={getCardBelow('tableau', i, cardIndex)!.suit}
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 0.5 }}
                           exit={{ opacity: 0 }}
                         >
-                          {getCardBelow('tableau', i, j)!.rank}
+                          {getCardBelow('tableau', i, cardIndex)!.rank}
                         </CardPreview>
                       )}
                     </AnimatePresence>
                     <Card
                       faceUp={card.faceUp}
                       suit={card.suit}
-                      style={{ top: j * 20 }}
-                      onClick={() => handleCardClick('tableau', i, j)}
+                      style={{ top: cardIndex * 20 }}
+                      onClick={() => handleCardClick('tableau', i, cardIndex)}
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
-                      isSelected={isCardSelected('tableau', i, j)}
+                      isSelected={isCardSelected('tableau', i, cardIndex)}
                       drag
                       dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
-                      onDragStart={() => setDraggedCard({ type: 'tableau', index: i, cardIndex: j })}
+                      onDragStart={() => setDraggedCard({ type: 'tableau', index: i, cardIndex })}
                       onDragEnd={() => setDraggedCard(null)}
                     >
                       {card.rank}
@@ -456,7 +456,7 @@ const PlayerBoard: React.FC<PlayerBoardProps> = ({
           <Row>
             {foundations.map((stack, i) => (
               <CardStack key={i}>
-                {stack.map((card, j) => (
+                {stack.map((card) => (
                   <Card
                     faceUp={true}
                     suit={card.suit}
